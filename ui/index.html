@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; script-src 'self'" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>mdedit</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-theme="light">
+  <div id="tabbar" role="tablist"></div>
+  <div id="fmtbar" class="fmtbar" role="toolbar" aria-label="Formatação">
+    <button data-fmt="h1" title="Título 1">H1</button>
+    <button data-fmt="h2" title="Título 2">H2</button>
+    <button data-fmt="h3" title="Título 3">H3</button>
+    <span class="sep"></span>
+    <button data-fmt="bold" title="Negrito (Cmd/Ctrl+B)"><b>B</b></button>
+    <button data-fmt="italic" title="Itálico (Cmd/Ctrl+I)"><i>I</i></button>
+    <button data-fmt="strike" title="Tachado"><s>S</s></button>
+    <button data-fmt="code" title="Código inline (Cmd/Ctrl+E)">&lt;/&gt;</button>
+    <span class="sep"></span>
+    <button data-fmt="ul" title="Lista">•</button>
+    <button data-fmt="ol" title="Lista numerada">1.</button>
+    <button data-fmt="quote" title="Citação">❝</button>
+    <button data-fmt="codeblock" title="Bloco de código">{ }</button>
+    <button data-fmt="mermaid" title="Diagrama Mermaid">◇</button>
+    <button data-fmt="hr" title="Linha horizontal">―</button>
+    <button data-fmt="link" title="Link (Cmd/Ctrl+K)">🔗</button>
+  </div>
+  <header id="toolbar">
+    <div class="group">
+      <button id="btn-new" title="Novo (Cmd/Ctrl+N)">Novo</button>
+      <button id="btn-open" title="Abrir (Cmd/Ctrl+O)">Abrir</button>
+      <select id="recent" title="Arquivos recentes (até 20)" aria-label="Arquivos recentes">
+        <option value="">Recentes</option>
+      </select>
+      <button id="btn-save" title="Salvar (Cmd/Ctrl+S)">Salvar</button>
+    </div>
+    <div class="group">
+      <button id="btn-mode" title="Modo: Visualizar / WYSIWYG / Código (Cmd/Ctrl+Shift+R)">WYSIWYG</button>
+    </div>
+    <div class="group zoom">
+      <button id="btn-zoom-out" title="Diminuir zoom (Cmd/Ctrl+-)">−</button>
+      <span id="zoom-label">100%</span>
+      <button id="btn-zoom-in" title="Aumentar zoom (Cmd/Ctrl+=)">+</button>
+    </div>
+    <span id="status"></span>
+  </header>
+  <main>
+    <textarea id="source" spellcheck="false" hidden></textarea>
+    <article id="preview" class="md-body"></article>
+  </main>
+  <div id="drop-overlay" class="drop-overlay" hidden aria-hidden="true">
+    <div class="drop-card">Solte para abrir o arquivo</div>
+  </div>
+  <dialog id="link-dialog" class="dialog">
+    <form method="dialog">
+      <label for="link-url">URL do link</label>
+      <input id="link-url" type="url" placeholder="https://" autocomplete="off" spellcheck="false" />
+      <div class="dialog-actions">
+        <button type="button" value="cancel" data-act="cancel">Cancelar</button>
+        <button type="submit" value="ok" class="primary">Inserir</button>
+      </div>
+    </form>
+  </dialog>
+  <script src="dist/app.js"></script>
+</body>
+</html>

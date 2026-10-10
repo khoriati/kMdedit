@@ -1,0 +1,31 @@
+{
+  "name": "mdedit",
+  "version": "1.0.0",
+  "description": "Editor de Markdown multiplataforma (Tauri) com Mermaid e alternancia render/fonte.",
+  "type": "commonjs",
+  "author": "mdedit",
+  "license": "MIT",
+  "scripts": {
+    "build:ui": "esbuild ui/app.js --bundle --format=iife --outfile=ui/dist/app.js --minify",
+    "dev": "npm run build:ui && tauri dev",
+    "build": "npm run build:ui && tauri build",
+    "tauri": "tauri",
+    "test": "node --test test/*.test.mjs",
+    "test:render": "node --test test/render.test.mjs",
+    "test:rust": "cargo test --manifest-path src-tauri/Cargo.toml"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.12.2",
+    "@tauri-apps/plugin-dialog": "^2.8.1",
+    "dompurify": "^3.1.7",
+    "marked": "^14.1.3",
+    "mermaid": "^10.9.1",
+    "turndown": "^7.2.4",
+    "turndown-plugin-gfm": "^1.0.2"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.12.1",
+    "esbuild": "^0.24.0",
+    "jsdom": "^25.0.1"
+  }
+}
