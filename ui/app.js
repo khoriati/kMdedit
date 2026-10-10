@@ -19,6 +19,8 @@ import { open, save, ask } from '@tauri-apps/plugin-dialog';
 
 const $ = (id) => document.getElementById(id);
 const source = $('source');
+const sourceWrap = $('source-wrap');
+const sourceBackdrop = $('source-backdrop');
 const preview = $('preview');
 const tabbar = $('tabbar');
 const status = $('status');
@@ -204,6 +206,7 @@ async function renderPreview() {
       html = pre.outerHTML;
     }
     if (isStale()) return;
+    editingDiagram = null;
     preview.innerHTML = html;
     decoratePreview();
     const r = await renderMermaidBlocks(preview, { mermaid, document, isStale });
@@ -242,6 +245,54 @@ preview.addEventListener('change', (e) => {
     markDirty();
   }
 });
+
+// ---------- diagramas: clicar para editar como código (estilo Typora) ----------
+// No WYSIWYG, clicar em um diagrama renderizado troca o <div class="mermaid">
+// por <pre><code class="language-mermaid">; ao mover o cursor para fora, o
+// bloco volta a ser desenhado.
+let editingDiagram = null;
+
+function openDiagramForEdit(div) {
+  const src = (div.getAttribute('data-src') ?? '').replace(/\n+$/, '');
+  const pre = document.createElement('pre');
+  const code = document.createElement('code');
+  code.className = 'language-mermaid';
+  pre.dataset.lang = 'mermaid';
+  code.textContent = src + '\n';
+  pre.appendChild(code);
+  div.replaceWith(pre);
+  editingDiagram = pre;
+  preview.focus();
+  placeCaretAtOffset(code, src.length);
+}
+
+async function closeDiagramEdit(pre) {
+  if (editingDiagram === pre) editingDiagram = null;
+  if (!pre.isConnected) return;
+  const code = pre.querySelector('code') || pre;
+  const src = code.textContent.replace(/\n+$/, '');
+  const div = document.createElement('div');
+  div.className = 'mermaid';
+  div.setAttribute('data-mermaid', '1');
+  div.setAttribute('data-src', src);
+  div.textContent = src;
+  pre.replaceWith(div);
+  if (!src.trim()) { div.remove(); return; }
+  await renderMermaidBlocks(div.parentElement || preview, { mermaid, document, isStale: () => !div.isConnected });
+}
+
+preview.addEventListener('click', (e) => {
+  if (preview.contentEditable !== 'true') return;
+  const div = e.target.closest('.mermaid');
+  if (div && preview.contains(div)) { e.preventDefault(); openDiagramForEdit(div); }
+});
+document.addEventListener('selectionchange', () => {
+  if (!editingDiagram) return;
+  const sel = window.getSelection();
+  const inside = sel && sel.rangeCount && editingDiagram.contains(sel.anchorNode);
+  if (!inside && document.activeElement === preview) closeDiagramEdit(editingDiagram);
+});
+preview.addEventListener('blur', () => { if (editingDiagram && !linkDialog.open) closeDiagramEdit(editingDiagram); });
 
 // ---------- formatação e digitação estilo Typora (WYSIWYG) ----------
 // Os comandos usam execCommand, que o WebKit do Tauri ainda aceita.
@@ -405,15 +456,19 @@ function insertList(cmd) {
   const li = currentBlock();
   const list = li && li.nodeName === 'LI' ? li.parentElement : null;
   if (list && list.parentElement && list.parentElement.nodeName === 'P' && list.parentElement.parentElement) {
+    // Mover a lista invalida a seleção: guarda o offset do cursor e restaura.
+    const offset = splitAtCaret(li).before.length;
     list.parentElement.replaceWith(list);
+    placeCaretAtOffset(li, offset);
   }
+  return currentBlock();
 }
 
 // Lista de tarefas: lista com checkbox no item atual.
 function makeTask(checked = false) {
   let li = currentBlock();
-  if (!li || li.nodeName !== 'LI') { insertList('insertUnorderedList'); li = currentBlock(); }
-  if (!li || li.nodeName !== 'LI') return;
+  if (!li || li.nodeName !== 'LI') li = insertList('insertUnorderedList');
+  if (!li || li.nodeName !== 'LI') { setStatus('coloque o cursor em um parágrafo para criar a tarefa', { error: true }); return; }
   if (li.querySelector(':scope > input[type="checkbox"]')) {
     li.querySelector(':scope > input[type="checkbox"]').remove();
     li.classList.remove('task', 'done');
@@ -581,10 +636,10 @@ function setMode(mode, { keepTab = false } = {}) {
   preview.contentEditable = mode === 'wysiwyg' ? 'true' : 'false';
   if (mode === 'source') {
     renderGen++; // cancela diagramas pendentes
-    preview.hidden = true; source.hidden = false; source.focus();
+    preview.hidden = true; sourceWrap.hidden = false; source.focus();
     if (!findbar.hidden) runFind({ keepIndex: true });
   } else {
-    source.hidden = true; preview.hidden = false;
+    sourceWrap.hidden = true; preview.hidden = false;
     renderPreview().then(() => { if (mode === 'wysiwyg' && tabs.active() === t && findbar.hidden) preview.focus(); });
   }
   for (const b of modeSwitch.querySelectorAll('button[data-mode]')) b.setAttribute('aria-checked', String(b.dataset.mode === mode));
@@ -629,8 +684,41 @@ function closeFind() {
 }
 function clearFindMarks() {
   if (hasHighlights) { CSS.highlights.delete('find-all'); CSS.highlights.delete('find-current'); }
+  // Fallback sem Highlight API: desembrulha as marcas inseridas no DOM.
+  for (const m of preview.querySelectorAll('mark.find-mark')) { m.replaceWith(...m.childNodes); }
+  if (!hasHighlights) preview.normalize();
+  sourceBackdrop.textContent = '';
   find.ranges = [];
 }
+// Marca ocorrências sem a Highlight API: só ranges dentro de um único nó de texto.
+function markRangesFallback() {
+  for (const range of find.ranges) {
+    if (range.startContainer !== range.endContainer || range.startContainer.nodeType !== 3) continue;
+    const m = document.createElement('mark');
+    m.className = 'find-mark';
+    try { range.surroundContents(m); } catch { /* range inválido: ignora */ }
+  }
+}
+// Modo Código: espelho do textarea com as marcas (a seleção do textarea não
+// aparece enquanto o foco está na caixa de busca).
+function renderSourceBackdrop() {
+  const text = source.value;
+  if (!find.matches.length) { sourceBackdrop.textContent = ''; return; }
+  const frag = document.createDocumentFragment();
+  let pos = 0;
+  find.matches.forEach((m, i) => {
+    if (m.start > pos) frag.appendChild(document.createTextNode(text.slice(pos, m.start)));
+    const mark = document.createElement('mark');
+    mark.className = 'find-mark' + (i === find.index ? ' current' : '');
+    mark.textContent = text.slice(m.start, m.end);
+    frag.appendChild(mark);
+    pos = m.end;
+  });
+  frag.appendChild(document.createTextNode(text.slice(pos) + '\n'));
+  sourceBackdrop.replaceChildren(frag);
+  sourceBackdrop.scrollTop = source.scrollTop; sourceBackdrop.scrollLeft = source.scrollLeft;
+}
+source.addEventListener('scroll', () => { sourceBackdrop.scrollTop = source.scrollTop; sourceBackdrop.scrollLeft = source.scrollLeft; });
 function runFind({ keepIndex = false } = {}) {
   const q = findInput.value;
   const t = tabs.active();
@@ -652,6 +740,7 @@ function runFind({ keepIndex = false } = {}) {
     });
     find.index = find.matches.length ? (keepIndex && prevIndex >= 0 ? Math.min(prevIndex, find.matches.length - 1) : 0) : -1;
     if (hasHighlights && find.ranges.length) CSS.highlights.set('find-all', new Highlight(...find.ranges));
+    else if (find.ranges.length) markRangesFallback();
   }
   showCurrentMatch();
 }
@@ -667,11 +756,16 @@ function showCurrentMatch() {
   const m = find.matches[find.index];
   if (t.mode === 'source') {
     source.setSelectionRange(m.start, m.end);
+    renderSourceBackdrop();
     scrollTextareaToSelection();
   } else {
     const range = find.ranges[find.index];
     if (hasHighlights) CSS.highlights.set('find-current', new Highlight(range));
-    else { const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range); }
+    else {
+      preview.querySelectorAll('mark.find-mark.current').forEach((m) => m.classList.remove('current'));
+      const m = range.startContainer.parentElement && range.startContainer.parentElement.closest('mark.find-mark');
+      if (m) m.classList.add('current');
+    }
     const rect = range.getBoundingClientRect();
     const box = preview.getBoundingClientRect();
     if (rect.top < box.top + 40 || rect.bottom > box.bottom - 40) {
@@ -680,12 +774,12 @@ function showCurrentMatch() {
   }
 }
 function scrollTextareaToSelection() {
-  // Aproximação por linhas: o textarea não expõe a posição do cursor.
-  const upto = source.value.slice(0, source.selectionStart);
-  const line = upto.split('\n').length - 1;
-  const lineHeight = parseFloat(getComputedStyle(source).lineHeight) || 20;
-  const y = line * lineHeight;
+  // O espelho tem o mesmo layout do textarea: usa a posição real da marca.
+  const mark = sourceBackdrop.querySelector('mark.current');
+  if (!mark) return;
+  const y = mark.offsetTop;
   if (y < source.scrollTop + 40 || y > source.scrollTop + source.clientHeight - 40) source.scrollTop = Math.max(0, y - source.clientHeight / 2);
+  sourceBackdrop.scrollTop = source.scrollTop;
 }
 function updateFindCount() {
   const n = find.matches.length;

@@ -89,7 +89,10 @@
     <button id="find-close" class="icon" data-hint="Fechar (Esc)" aria-label="Fechar"><svg><use href="#i-close"/></svg></button>
   </div>
   <main>
-    <textarea id="source" spellcheck="false" hidden></textarea>
+    <div id="source-wrap" hidden>
+      <div id="source-backdrop" aria-hidden="true"></div>
+      <textarea id="source" spellcheck="false"></textarea>
+    </div>
     <article id="preview" class="md-body"></article>
   </main>
   <div id="drop-overlay" class="drop-overlay" hidden aria-hidden="true">
