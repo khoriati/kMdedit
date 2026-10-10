@@ -1,3 +1,5 @@
+<p align="center"><img src="assets/logo.png" width="160" alt="mdedit"></p>
+
 # mdedit
 
 Editor de Markdown para desktop (macOS, Windows e Linux) construído com
@@ -59,6 +61,7 @@ npm run test:rust  # testes do backend Rust
 ## Estrutura
 
 ```
+assets/     logotipo (SVG fonte e PNG 1024); os ícones do app vêm de `tauri icon`
 lib/        lógica pura e testável (render, mermaid, conversão, abas, regras)
 ui/         index.html, style.css e app.js (bundle gerado em ui/dist)
 src-tauri/  backend Rust: leitura/escrita de texto, menu nativo, permissões
