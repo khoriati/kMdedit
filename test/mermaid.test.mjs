@@ -5,8 +5,8 @@ import { ctx, doc } from './dom.mjs';
 import { renderMarkdown } from '../lib/render.mjs';
 import { htmlToMarkdown } from '../lib/convert.mjs';
 import {
-  renderMermaidBlocks, describeRenderError, cleanupMermaid, ensureSandbox,
-  withTimeout, SANDBOX_ID, ERROR_CLASS,
+  renderMermaidBlocks, describeRenderError, cleanupMermaid, ensureSandbox, usableWidth,
+  withTimeout, SANDBOX_ID, ERROR_CLASS, DEFAULT_WIDTH,
 } from '../lib/mermaid.mjs';
 
 // Dublê do mermaid: imita o comportamento da v10, inclusive o resíduo no <body>
@@ -25,6 +25,7 @@ function fakeMermaid({ failOn = /invalido/, hangOn = /trava/, throwValue } = {})
     },
     async render(id, src, container) {
       calls.render++;
+      calls.containerWidth = container && container.style.width;
       const tmp = doc.createElement('div');
       tmp.id = 'd' + id;
       (container ?? doc.body).appendChild(tmp);
@@ -136,4 +137,18 @@ test('mermaid: cleanupMermaid remove resíduos d<id>/i<id> do body', () => {
 test('mermaid: withTimeout resolve antes do limite e rejeita depois', async () => {
   assert.equal(await withTimeout(Promise.resolve(1), 50), 1);
   await assert.rejects(withTimeout(new Promise(() => {}), 10, 'op'), /op excedeu 10 ms/);
+});
+
+test('mermaid: o container isolado tem largura real (gantt mede o pai ao desenhar)', async () => {
+  const mm = fakeMermaid();
+  const root = rootFor(MD('gantt\n  title x'));
+  await renderMermaidBlocks(root, { mermaid: mm, document: doc, width: 640 });
+  assert.equal(mm.calls.containerWidth, '640px');
+  const box = doc.getElementById(SANDBOX_ID);
+  assert.doesNotMatch(box.style.cssText, /visibility:\s*hidden|display:\s*none/, 'getBBox precisa de layout');
+  // sem largura medível (jsdom não faz layout) cai no padrão
+  await renderMermaidBlocks(root, { mermaid: mm, document: doc });
+  assert.equal(mm.calls.containerWidth, DEFAULT_WIDTH + 'px');
+  assert.equal(usableWidth(null), DEFAULT_WIDTH);
+  assert.equal(ensureSandbox(doc, 10).style.width, '200px', 'largura mínima');
 });

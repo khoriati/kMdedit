@@ -108,7 +108,7 @@ main { flex: 1; overflow: hidden; display: flex; min-height: 0; }
   margin: 0 0 8px; color: var(--danger); font-size: .9em; font-weight: 600; font-family: var(--font-ui);
 }
 .md-body .mermaid-error pre, .md-body .render-error pre { margin: 0; }
-#mermaid-sandbox { position: fixed; left: -100000px; top: 0; width: 1px; height: 1px; overflow: hidden; visibility: hidden; }
+#mermaid-sandbox { position: fixed; left: -100000px; top: 0; opacity: 0; pointer-events: none; }
 
 /* ---- arrastar e soltar arquivos ---- */
 .drop-overlay {
