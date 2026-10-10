@@ -36,3 +36,11 @@ test('wysiwyg: nao ha 3+ quebras de linha seguidas', () => {
   const out = roundtrip('# A\n\n\n\n# B\n');
   assert.doesNotMatch(out, /\n{3,}/);
 });
+
+test('wysiwyg: artefatos do contenteditable (<br> final, nbsp, separador zero) não vazam', () => {
+  const box = doc.createElement('div');
+  box.innerHTML = '<ul><li class="task"><input type="checkbox">primeira<br></li><li><input type="checkbox" checked>segunda<br></li></ul>'
+    + '<p>fim com&nbsp;<strong>negrito</strong>\u200B e <code>c\u200Bod</code></p><pre><code>a\u00A0b\n</code></pre>';
+  const out = htmlToMarkdown(box);
+  assert.equal(out, '- [ ] primeira\n- [x] segunda\n\nfim com **negrito** e `cod`\n\n```\na\u00A0b\n```\n');
+});

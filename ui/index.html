@@ -8,44 +8,86 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body data-theme="light">
+  <svg hidden aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="i-new" viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M12 12v6M9 15h6"/></symbol>
+    <symbol id="i-open" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+    <symbol id="i-save" viewBox="0 0 24 24"><path d="M5 3h11l3 3v15H5z"/><path d="M8 3v5h7V3"/><path d="M8 21v-7h8v7"/></symbol>
+    <symbol id="i-find" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+    <symbol id="i-wysiwyg" viewBox="0 0 24 24"><path d="M4 20h4l10-10-4-4L4 16z"/><path d="m12.5 7.5 4 4"/></symbol>
+    <symbol id="i-source" viewBox="0 0 24 24"><path d="m8 7-5 5 5 5"/><path d="m16 7 5 5-5 5"/><path d="m14 4-4 16"/></symbol>
+    <symbol id="i-render" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-bold" viewBox="0 0 24 24"><path d="M7 4h7a4 4 0 0 1 0 8H7z"/><path d="M7 12h8a4 4 0 0 1 0 8H7z"/></symbol>
+    <symbol id="i-italic" viewBox="0 0 24 24"><path d="M10 4h8M6 20h8M14 4l-4 16"/></symbol>
+    <symbol id="i-strike" viewBox="0 0 24 24"><path d="M4 12h16"/><path d="M17 7.5A4.5 4.5 0 0 0 12.5 4H11a4 4 0 0 0 0 8"/><path d="M7 16.5A4.5 4.5 0 0 0 11.5 20H13a4 4 0 0 0 0-8"/></symbol>
+    <symbol id="i-code" viewBox="0 0 24 24"><path d="m9 8-4 4 4 4"/><path d="m15 8 4 4-4 4"/></symbol>
+    <symbol id="i-ul" viewBox="0 0 24 24"><path d="M9 6h12M9 12h12M9 18h12"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></symbol>
+    <symbol id="i-ol" viewBox="0 0 24 24"><path d="M10 6h11M10 12h11M10 18h11"/><path d="M4 4.5h1.5V9M3.5 14.5c0-1 2.5-1.2 2.5 0 0 .8-2.5 1.8-2.5 3h3"/></symbol>
+    <symbol id="i-task" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="m8 12 3 3 5-6"/></symbol>
+    <symbol id="i-quote" viewBox="0 0 24 24"><path d="M10 11H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v6a4 4 0 0 1-4 4"/><path d="M20 11h-4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v6a4 4 0 0 1-4 4"/></symbol>
+    <symbol id="i-codeblock" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m9 10-2 2 2 2"/><path d="m15 10 2 2-2 2"/></symbol>
+    <symbol id="i-mermaid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="6" rx="1"/><rect x="14" y="15" width="7" height="6" rx="1"/><rect x="14" y="3" width="7" height="6" rx="1"/><path d="M10 6h4M17.5 9v6M6.5 9v9H14"/></symbol>
+    <symbol id="i-hr" viewBox="0 0 24 24"><path d="M3 12h18"/><path d="M6 6h12M6 18h12" opacity=".35"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1.5 1.5"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.5-1.5"/></symbol>
+    <symbol id="i-up" viewBox="0 0 24 24"><path d="m6 15 6-6 6 6"/></symbol>
+    <symbol id="i-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  </svg>
+
   <div id="tabbar" role="tablist"></div>
-  <div id="fmtbar" class="fmtbar" role="toolbar" aria-label="Formatação">
-    <button data-fmt="h1" title="Título 1">H1</button>
-    <button data-fmt="h2" title="Título 2">H2</button>
-    <button data-fmt="h3" title="Título 3">H3</button>
-    <span class="sep"></span>
-    <button data-fmt="bold" title="Negrito (Cmd/Ctrl+B)"><b>B</b></button>
-    <button data-fmt="italic" title="Itálico (Cmd/Ctrl+I)"><i>I</i></button>
-    <button data-fmt="strike" title="Tachado"><s>S</s></button>
-    <button data-fmt="code" title="Código inline (Cmd/Ctrl+E)">&lt;/&gt;</button>
-    <span class="sep"></span>
-    <button data-fmt="ul" title="Lista">•</button>
-    <button data-fmt="ol" title="Lista numerada">1.</button>
-    <button data-fmt="quote" title="Citação">❝</button>
-    <button data-fmt="codeblock" title="Bloco de código">{ }</button>
-    <button data-fmt="mermaid" title="Diagrama Mermaid">◇</button>
-    <button data-fmt="hr" title="Linha horizontal">―</button>
-    <button data-fmt="link" title="Link (Cmd/Ctrl+K)">🔗</button>
-  </div>
   <header id="toolbar">
     <div class="group">
-      <button id="btn-new" title="Novo (Cmd/Ctrl+N)">Novo</button>
-      <button id="btn-open" title="Abrir (Cmd/Ctrl+O)">Abrir</button>
-      <select id="recent" title="Arquivos recentes (até 20)" aria-label="Arquivos recentes">
+      <button id="btn-new" class="icon" data-hint="Novo (⌘N)" aria-label="Novo"><svg><use href="#i-new"/></svg></button>
+      <button id="btn-open" class="icon" data-hint="Abrir… (⌘O)" aria-label="Abrir"><svg><use href="#i-open"/></svg></button>
+      <button id="btn-save" class="icon" data-hint="Salvar (⌘S)" aria-label="Salvar"><svg><use href="#i-save"/></svg></button>
+      <select id="recent" data-hint="Arquivos recentes" aria-label="Arquivos recentes">
         <option value="">Recentes</option>
       </select>
-      <button id="btn-save" title="Salvar (Cmd/Ctrl+S)">Salvar</button>
+    </div>
+    <div class="group segmented" id="mode-switch" role="radiogroup" aria-label="Modo">
+      <button class="icon" data-mode="wysiwyg" data-hint="WYSIWYG (⌘⇧R alterna)" aria-label="WYSIWYG"><svg><use href="#i-wysiwyg"/></svg></button>
+      <button class="icon" data-mode="source" data-hint="Código-fonte" aria-label="Código"><svg><use href="#i-source"/></svg></button>
+      <button class="icon" data-mode="render" data-hint="Visualizar (somente leitura)" aria-label="Visualizar"><svg><use href="#i-render"/></svg></button>
     </div>
     <div class="group">
-      <button id="btn-mode" title="Modo: Visualizar / WYSIWYG / Código (Cmd/Ctrl+Shift+R)">WYSIWYG</button>
+      <button id="btn-find" class="icon" data-hint="Localizar (⌘F)" aria-label="Localizar"><svg><use href="#i-find"/></svg></button>
     </div>
     <div class="group zoom">
-      <button id="btn-zoom-out" title="Diminuir zoom (Cmd/Ctrl+-)">−</button>
+      <button id="btn-zoom-out" class="icon" data-hint="Diminuir zoom (⌘−)" aria-label="Diminuir zoom"><svg><use href="#i-minus"/></svg></button>
       <span id="zoom-label">100%</span>
-      <button id="btn-zoom-in" title="Aumentar zoom (Cmd/Ctrl+=)">+</button>
+      <button id="btn-zoom-in" class="icon" data-hint="Aumentar zoom (⌘=)" aria-label="Aumentar zoom"><svg><use href="#i-plus"/></svg></button>
     </div>
     <span id="status"></span>
   </header>
+  <div id="fmtbar" class="fmtbar" role="toolbar" aria-label="Formatação">
+    <button data-fmt="h1" data-hint="Título 1 (⌘1)" aria-label="Título 1"><b>H1</b></button>
+    <button data-fmt="h2" data-hint="Título 2 (⌘2)" aria-label="Título 2"><b>H2</b></button>
+    <button data-fmt="h3" data-hint="Título 3 (⌘3)" aria-label="Título 3"><b>H3</b></button>
+    <span class="sep"></span>
+    <button data-fmt="bold" data-hint="Negrito (⌘B)" aria-label="Negrito"><svg><use href="#i-bold"/></svg></button>
+    <button data-fmt="italic" data-hint="Itálico (⌘I)" aria-label="Itálico"><svg><use href="#i-italic"/></svg></button>
+    <button data-fmt="strike" data-hint="Tachado" aria-label="Tachado"><svg><use href="#i-strike"/></svg></button>
+    <button data-fmt="code" data-hint="Código inline (⌘E)" aria-label="Código inline"><svg><use href="#i-code"/></svg></button>
+    <button data-fmt="link" data-hint="Link (⌘K)" aria-label="Link"><svg><use href="#i-link"/></svg></button>
+    <span class="sep"></span>
+    <button data-fmt="ul" data-hint="Lista (⌘⌥U)" aria-label="Lista"><svg><use href="#i-ul"/></svg></button>
+    <button data-fmt="ol" data-hint="Lista numerada (⌘⌥O)" aria-label="Lista numerada"><svg><use href="#i-ol"/></svg></button>
+    <button data-fmt="task" data-hint="Lista de tarefas (⌘⌥X)" aria-label="Lista de tarefas"><svg><use href="#i-task"/></svg></button>
+    <button data-fmt="quote" data-hint="Citação (⌘⌥Q)" aria-label="Citação"><svg><use href="#i-quote"/></svg></button>
+    <span class="sep"></span>
+    <button data-fmt="codeblock" data-hint="Bloco de código (⌘⌥C)" aria-label="Bloco de código"><svg><use href="#i-codeblock"/></svg></button>
+    <button data-fmt="mermaid" data-hint="Diagrama Mermaid (⌘⌥M)" aria-label="Diagrama Mermaid"><svg><use href="#i-mermaid"/></svg></button>
+    <button data-fmt="hr" data-hint="Linha horizontal (⌘⌥−)" aria-label="Linha horizontal"><svg><use href="#i-hr"/></svg></button>
+  </div>
+  <div id="findbar" class="findbar" hidden role="search">
+    <svg class="find-icon"><use href="#i-find"/></svg>
+    <input id="find-input" type="search" placeholder="Localizar" autocomplete="off" spellcheck="false" aria-label="Texto a localizar" />
+    <span id="find-count" aria-live="polite"></span>
+    <button id="find-prev" class="icon" data-hint="Anterior (⇧↩)" aria-label="Anterior"><svg><use href="#i-up"/></svg></button>
+    <button id="find-next" class="icon" data-hint="Próximo (↩)" aria-label="Próximo"><svg><use href="#i-down"/></svg></button>
+    <button id="find-close" class="icon" data-hint="Fechar (Esc)" aria-label="Fechar"><svg><use href="#i-close"/></svg></button>
+  </div>
   <main>
     <textarea id="source" spellcheck="false" hidden></textarea>
     <article id="preview" class="md-body"></article>

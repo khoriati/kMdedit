@@ -7,8 +7,12 @@ que alterna entre **WYSIWYG**, **Código** e **Visualizar**, com diagramas
 
 ## Recursos
 
-- Três modos por aba: WYSIWYG (digitação estilo Typora: `# `, `- `, `> `,
-  ` ``` `, `**negrito**`, `` `código` ``...), Código (textarea) e Visualizar.
+- Três modos por aba: WYSIWYG (digitação estilo Typora: `# `, `- `, `- [ ] `,
+  `> `, ` ``` `, `**negrito**`, `` `código` ``...), Código (textarea) e
+  Visualizar. Dentro de um bloco de código o Enter quebra linha; Cmd/Ctrl+Enter
+  (ou Enter após uma linha vazia) sai do bloco.
+- Busca (Cmd/Ctrl+F) nos três modos, com contagem e navegação entre ocorrências.
+- Barra de ferramentas com ícones e dicas; listas de tarefas clicáveis.
 - Abas, arquivos recentes (até 20), zoom e temas claro/escuro/alto contraste.
 - Diagramas Mermaid em blocos ```` ```mermaid ````. Um diagrama inválido vira um
   cartão de erro com a fonte; o restante do documento e os outros diagramas
@@ -29,10 +33,15 @@ que alterna entre **WYSIWYG**, **Código** e **Visualizar**, com diagramas
 | Abrir | Cmd/Ctrl+O |
 | Salvar / Salvar como | Cmd/Ctrl+S / Cmd/Ctrl+Shift+S |
 | Fechar aba | Cmd/Ctrl+W |
+| Localizar / próxima ocorrência | Cmd/Ctrl+F / Enter (Shift+Enter volta) |
 | Alternar modo (WYSIWYG → Código → Visualizar) | Cmd/Ctrl+Shift+R |
 | Próxima / aba anterior | Ctrl+Tab / Ctrl+Shift+Tab |
 | Zoom | Cmd/Ctrl+= , Cmd/Ctrl+- , Cmd/Ctrl+0 |
-| Negrito / itálico / código / link (WYSIWYG) | Cmd/Ctrl+B / I / E / K |
+| Títulos 1 a 6 (WYSIWYG) | Cmd/Ctrl+1 … 6 |
+| Negrito / itálico / código / link | Cmd/Ctrl+B / I / E / K |
+| Lista / numerada / tarefas / citação | Cmd/Ctrl+Alt+U / O / X / Q |
+| Bloco de código / Mermaid / linha horizontal | Cmd/Ctrl+Alt+C / M / − |
+| Sair do bloco de código | Cmd/Ctrl+Enter |
 
 ## Desenvolvimento
 

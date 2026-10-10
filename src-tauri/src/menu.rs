@@ -3,6 +3,10 @@
 use tauri::menu::{Menu, MenuItem, PredefinedMenuItem, Submenu};
 use tauri::{AppHandle, Emitter, Runtime};
 
+fn item<R: Runtime>(app: &AppHandle<R>, id: &str, label: &str, accel: Option<&str>) -> tauri::Result<MenuItem<R>> {
+    MenuItem::with_id(app, id, label, true, accel)
+}
+
 pub fn build<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
     let app_menu = Submenu::with_items(app, "mdedit", true, &[
         &PredefinedMenuItem::about(app, Some("Sobre mdedit"), None)?,
@@ -17,13 +21,13 @@ pub fn build<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
     ])?;
 
     let file = Submenu::with_items(app, "Arquivo", true, &[
-        &MenuItem::with_id(app, "new", "Novo", true, Some("CmdOrCtrl+N"))?,
-        &MenuItem::with_id(app, "open", "Abrir…", true, Some("CmdOrCtrl+O"))?,
+        &item(app, "new", "Novo", Some("CmdOrCtrl+N"))?,
+        &item(app, "open", "Abrir…", Some("CmdOrCtrl+O"))?,
         &PredefinedMenuItem::separator(app)?,
-        &MenuItem::with_id(app, "save", "Salvar", true, Some("CmdOrCtrl+S"))?,
-        &MenuItem::with_id(app, "saveAs", "Salvar como…", true, Some("CmdOrCtrl+Shift+S"))?,
+        &item(app, "save", "Salvar", Some("CmdOrCtrl+S"))?,
+        &item(app, "saveAs", "Salvar como…", Some("CmdOrCtrl+Shift+S"))?,
         &PredefinedMenuItem::separator(app)?,
-        &MenuItem::with_id(app, "close", "Fechar aba", true, Some("CmdOrCtrl+W"))?,
+        &item(app, "close", "Fechar aba", Some("CmdOrCtrl+W"))?,
     ])?;
 
     let edit = Submenu::with_items(app, "Editar", true, &[
@@ -34,30 +38,56 @@ pub fn build<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
         &PredefinedMenuItem::copy(app, None)?,
         &PredefinedMenuItem::paste(app, None)?,
         &PredefinedMenuItem::select_all(app, None)?,
+        &PredefinedMenuItem::separator(app)?,
+        &item(app, "find", "Localizar…", Some("CmdOrCtrl+F"))?,
+    ])?;
+
+    let format = Submenu::with_items(app, "Formatar", true, &[
+        &item(app, "h1", "Título 1", Some("CmdOrCtrl+1"))?,
+        &item(app, "h2", "Título 2", Some("CmdOrCtrl+2"))?,
+        &item(app, "h3", "Título 3", Some("CmdOrCtrl+3"))?,
+        &item(app, "paragraph", "Parágrafo", None)?,
+        &PredefinedMenuItem::separator(app)?,
+        &item(app, "bold", "Negrito", Some("CmdOrCtrl+B"))?,
+        &item(app, "italic", "Itálico", Some("CmdOrCtrl+I"))?,
+        &item(app, "strike", "Tachado", None)?,
+        &item(app, "code", "Código inline", Some("CmdOrCtrl+E"))?,
+        &item(app, "link", "Link…", Some("CmdOrCtrl+K"))?,
+        &PredefinedMenuItem::separator(app)?,
+        &item(app, "ul", "Lista", Some("CmdOrCtrl+Alt+U"))?,
+        &item(app, "ol", "Lista numerada", Some("CmdOrCtrl+Alt+O"))?,
+        &item(app, "task", "Lista de tarefas", Some("CmdOrCtrl+Alt+X"))?,
+        &item(app, "quote", "Citação", Some("CmdOrCtrl+Alt+Q"))?,
+        &PredefinedMenuItem::separator(app)?,
+        &item(app, "codeblock", "Bloco de código", Some("CmdOrCtrl+Alt+C"))?,
+        &item(app, "mermaid", "Diagrama Mermaid", Some("CmdOrCtrl+Alt+M"))?,
+        &item(app, "hr", "Linha horizontal", Some("CmdOrCtrl+Alt+-"))?,
     ])?;
 
     let view = Submenu::with_items(app, "Visualizar", true, &[
-        &MenuItem::with_id(app, "mode", "Alternar modo (WYSIWYG / Código / Visualizar)", true, Some("CmdOrCtrl+Shift+R"))?,
+        &item(app, "modeWysiwyg", "WYSIWYG", None)?,
+        &item(app, "modeSource", "Código-fonte", None)?,
+        &item(app, "modeRender", "Visualizar", None)?,
+        &item(app, "mode", "Alternar modo", Some("CmdOrCtrl+Shift+R"))?,
         &PredefinedMenuItem::separator(app)?,
-        &MenuItem::with_id(app, "zoomIn", "Aumentar zoom", true, Some("CmdOrCtrl+="))?,
-        &MenuItem::with_id(app, "zoomOut", "Diminuir zoom", true, Some("CmdOrCtrl+-"))?,
-        &MenuItem::with_id(app, "zoomReset", "Tamanho real", true, Some("CmdOrCtrl+0"))?,
+        &item(app, "zoomIn", "Aumentar zoom", Some("CmdOrCtrl+="))?,
+        &item(app, "zoomOut", "Diminuir zoom", Some("CmdOrCtrl+-"))?,
+        &item(app, "zoomReset", "Tamanho real", Some("CmdOrCtrl+0"))?,
         &PredefinedMenuItem::separator(app)?,
-        &MenuItem::with_id(app, "themeLight", "Tema claro", true, None::<&str>)?,
-        &MenuItem::with_id(app, "themeDark", "Tema escuro", true, None::<&str>)?,
-        &MenuItem::with_id(app, "themeContrast", "Alto contraste", true, None::<&str>)?,
+        &item(app, "themeLight", "Tema claro", None)?,
+        &item(app, "themeDark", "Tema escuro", None)?,
+        &item(app, "themeContrast", "Alto contraste", None)?,
         &PredefinedMenuItem::separator(app)?,
         &PredefinedMenuItem::fullscreen(app, None)?,
     ])?;
 
+    // Sem "Fechar janela" aqui: o Cmd+W pertence a "Fechar aba".
     let window = Submenu::with_items(app, "Janela", true, &[
         &PredefinedMenuItem::minimize(app, None)?,
         &PredefinedMenuItem::maximize(app, None)?,
-        &PredefinedMenuItem::separator(app)?,
-        &PredefinedMenuItem::close_window(app, None)?,
     ])?;
 
-    Menu::with_items(app, &[&app_menu, &file, &edit, &view, &window])
+    Menu::with_items(app, &[&app_menu, &file, &edit, &format, &view, &window])
 }
 
 pub fn on_event<R: Runtime>(app: &AppHandle<R>, id: &str) {
