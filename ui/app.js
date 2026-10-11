@@ -10,6 +10,7 @@ import { TabStore, clampZoom, zoomStep, normalizeTheme, ZOOM_DEFAULT } from '../
 import { blockRule, inlineRule } from '../lib/rules.mjs';
 import { codeBlockKey, formatShortcut } from '../lib/editing.mjs';
 import { findMatches, nearestIndex, cycleIndex, collectText, matchToRange } from '../lib/find.mjs';
+import { templateGroups, findTemplate } from '../lib/mermaid-templates.mjs';
 import { addRecent, normalizeRecent, removeRecent } from '../lib/recent.mjs';
 import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
@@ -31,6 +32,7 @@ const recentSel = $('recent');
 const dropOverlay = $('drop-overlay');
 const linkDialog = $('link-dialog');
 const findbar = $('findbar');
+const mermaidMenu = $('mermaid-menu');
 const findInput = $('find-input');
 const findCount = $('find-count');
 
@@ -374,13 +376,13 @@ function newParagraphAfter(el) {
   return p;
 }
 
-function insertCodeBlock(lang = '') {
+function insertCodeBlock(lang = '', initial = '') {
   const sel = selection();
   if (!sel) { preview.focus(); }
   const pre = document.createElement('pre');
   const code = document.createElement('code');
   if (lang) { code.className = 'language-' + lang; pre.dataset.lang = lang; }
-  code.textContent = '\n';
+  code.textContent = initial + '\n';
   pre.appendChild(code);
   const block = currentBlock();
   if (block && block !== preview && block.nodeName !== 'LI' && !block.textContent.trim()) {
@@ -390,9 +392,73 @@ function insertCodeBlock(lang = '') {
   } else {
     preview.appendChild(pre);
   }
-  placeCaret(code.firstChild, 0);
+  placeCaretAtOffset(code, initial.length);
+  // Um bloco mermaid novo é desenhado assim que o cursor sai dele.
+  if (lang === 'mermaid') editingDiagram = pre;
   markDirty();
 }
+
+// ---------- menu de modelos Mermaid ----------
+function buildMermaidMenu() {
+  mermaidMenu.innerHTML = '';
+  for (const g of templateGroups()) {
+    const head = document.createElement('div');
+    head.className = 'menu-group';
+    head.textContent = g.group;
+    mermaidMenu.appendChild(head);
+    for (const t of g.items) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.setAttribute('role', 'menuitem');
+      b.dataset.template = t.id;
+      b.textContent = t.label;
+      if (t.source) {
+        const hint = document.createElement('small');
+        hint.textContent = t.source.split('\n')[0];
+        b.appendChild(hint);
+      }
+      mermaidMenu.appendChild(b);
+    }
+  }
+}
+function openMermaidMenu(anchor) {
+  if (!mermaidMenu.childElementCount) buildMermaidMenu();
+  const r = (anchor || fmtbar.querySelector('[data-fmt="mermaid"]')).getBoundingClientRect();
+  mermaidMenu.hidden = false;
+  mermaidMenu.style.left = Math.min(r.left, window.innerWidth - mermaidMenu.offsetWidth - 8) + 'px';
+  mermaidMenu.style.top = (r.bottom + 4) + 'px';
+  fmtbar.querySelector('[data-fmt="mermaid"]').setAttribute('aria-expanded', 'true');
+  const first = mermaidMenu.querySelector('[role="menuitem"]');
+  if (first) first.focus();
+}
+function closeMermaidMenu({ refocus = true } = {}) {
+  if (mermaidMenu.hidden) return;
+  mermaidMenu.hidden = true;
+  fmtbar.querySelector('[data-fmt="mermaid"]').setAttribute('aria-expanded', 'false');
+  if (refocus) preview.focus();
+}
+function pickMermaidTemplate(id) {
+  const t = findTemplate(id);
+  closeMermaidMenu();
+  if (!t) return;
+  insertCodeBlock('mermaid', t.source);
+}
+mermaidMenu.addEventListener('mousedown', (e) => e.preventDefault()); // mantém a seleção do editor
+mermaidMenu.addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-template]');
+  if (b) pickMermaidTemplate(b.dataset.template);
+});
+mermaidMenu.addEventListener('keydown', (e) => {
+  const items = [...mermaidMenu.querySelectorAll('[role="menuitem"]')];
+  const i = items.indexOf(document.activeElement);
+  if (e.key === 'ArrowDown') { e.preventDefault(); items[(i + 1) % items.length].focus(); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); items[(i - 1 + items.length) % items.length].focus(); }
+  else if (e.key === 'Escape') { e.preventDefault(); closeMermaidMenu(); }
+  else if (e.key === 'Enter' && i >= 0) { e.preventDefault(); pickMermaidTemplate(items[i].dataset.template); }
+});
+document.addEventListener('mousedown', (e) => {
+  if (!mermaidMenu.hidden && !mermaidMenu.contains(e.target) && !e.target.closest('[data-fmt="mermaid"]')) closeMermaidMenu({ refocus: false });
+});
 
 // Teclas dentro de um bloco de código: o WebKit dividiria o <pre> em dois ao
 // dar Enter (parecendo "abrir outro bloco"); aqui o Enter vira '\n' no código.
@@ -605,7 +671,7 @@ const FMT = {
   task: () => makeTask(false),
   quote: () => exec('formatBlock', 'BLOCKQUOTE'),
   codeblock: () => insertCodeBlock(''),
-  mermaid: () => insertCodeBlock('mermaid'),
+  mermaid: () => (mermaidMenu.hidden ? openMermaidMenu() : closeMermaidMenu()),
   hr: () => exec('insertHorizontalRule'),
   link: askLink,
 };
@@ -633,6 +699,7 @@ function setMode(mode, { keepTab = false } = {}) {
     source.value = t.text;
   }
   if (t) t.mode = mode;
+  closeMermaidMenu({ refocus: false });
   preview.contentEditable = mode === 'wysiwyg' ? 'true' : 'false';
   if (mode === 'source') {
     renderGen++; // cancela diagramas pendentes

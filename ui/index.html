@@ -77,9 +77,10 @@
     <button data-fmt="quote" data-hint="Citação (⌘⌥Q)" aria-label="Citação"><svg><use href="#i-quote"/></svg></button>
     <span class="sep"></span>
     <button data-fmt="codeblock" data-hint="Bloco de código (⌘⌥C)" aria-label="Bloco de código"><svg><use href="#i-codeblock"/></svg></button>
-    <button data-fmt="mermaid" data-hint="Diagrama Mermaid (⌘⌥M)" aria-label="Diagrama Mermaid"><svg><use href="#i-mermaid"/></svg></button>
+    <button data-fmt="mermaid" data-hint="Diagrama Mermaid (⌘⌥M)" aria-label="Diagrama Mermaid" aria-haspopup="menu" aria-expanded="false"><svg><use href="#i-mermaid"/></svg></button>
     <button data-fmt="hr" data-hint="Linha horizontal (⌘⌥−)" aria-label="Linha horizontal"><svg><use href="#i-hr"/></svg></button>
   </div>
+  <div id="mermaid-menu" class="menu" role="menu" aria-label="Modelos de diagrama" hidden></div>
   <div id="findbar" class="findbar" hidden role="search">
     <svg class="find-icon"><use href="#i-find"/></svg>
     <input id="find-input" type="search" placeholder="Localizar" autocomplete="off" spellcheck="false" aria-label="Texto a localizar" />

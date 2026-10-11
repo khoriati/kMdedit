@@ -13,6 +13,11 @@ que alterna entre **WYSIWYG**, **Código** e **Visualizar**, com diagramas
   `> `, ` ``` `, `**negrito**`, `` `código` ``...), Código (textarea) e
   Visualizar. Dentro de um bloco de código o Enter quebra linha; Cmd/Ctrl+Enter
   (ou Enter após uma linha vazia) sai do bloco.
+- Botão de diagrama com menu de modelos Mermaid (fluxograma, fluxograma com
+  subgráficos, sequência, classes, estados, ER, Gantt, linha do tempo, jornada,
+  pizza, XY, quadrantes, Sankey, mapa mental, git, C4, requisitos, blocos), cada
+  um com um exemplo de partida. No WYSIWYG, clicar em um diagrama desenhado abre
+  o código; ao sair do bloco ele é desenhado de novo.
 - Busca (Cmd/Ctrl+F) nos três modos, com contagem e navegação entre ocorrências.
 - Barra de ferramentas com ícones e dicas; listas de tarefas clicáveis.
 - Abas, arquivos recentes (até 20), zoom e temas claro/escuro/alto contraste.
