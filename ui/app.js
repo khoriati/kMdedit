@@ -1,4 +1,4 @@
-// ui/app.js — frontend do mdedit (Tauri). Lógica pura fica em lib/*.mjs.
+// ui/app.js — frontend do kMdedit (Tauri). Lógica pura fica em lib/*.mjs.
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import mermaid from 'mermaid';
@@ -54,7 +54,7 @@ function setStatus(msg, { error = false, ttl = error ? 8000 : 4000 } = {}) {
 }
 function reportError(context, err) {
   const msg = err && err.message ? err.message : String(err);
-  console.error(`[mdedit] ${context}:`, err);
+  console.error(`[kmdedit] ${context}:`, err);
   setStatus(`${context}: ${msg}`, { error: true });
 }
 // Nada que escape de um handler pode derrubar a interface: registra e segue.
@@ -83,7 +83,7 @@ function applyTheme(theme, { rerender = true } = {}) {
   const changed = prefs.theme !== normalizeTheme(theme);
   prefs.theme = normalizeTheme(theme);
   document.body.dataset.theme = prefs.theme;
-  try { localStorage.setItem('mdedit.theme', prefs.theme); } catch { /* sem storage */ }
+  try { localStorage.setItem('kmdedit.theme', prefs.theme); } catch { /* sem storage */ }
   initMermaid();
   // Só o modo Visualizar é redesenhado: no WYSIWYG isso perderia o cursor.
   const t = tabs.active();
@@ -93,14 +93,14 @@ function applyZoom(z) {
   prefs.zoom = clampZoom(z);
   document.documentElement.style.setProperty('--zoom', String(prefs.zoom));
   zoomLabel.textContent = Math.round(prefs.zoom * 100) + '%';
-  try { localStorage.setItem('mdedit.zoom', String(prefs.zoom)); } catch { /* sem storage */ }
+  try { localStorage.setItem('kmdedit.zoom', String(prefs.zoom)); } catch { /* sem storage */ }
 }
 function loadPrefs() {
   let theme = 'light';
   let zoom = ZOOM_DEFAULT;
   try {
-    theme = localStorage.getItem('mdedit.theme') || theme;
-    zoom = Number(localStorage.getItem('mdedit.zoom')) || zoom;
+    theme = localStorage.getItem('kmdedit.theme') || theme;
+    zoom = Number(localStorage.getItem('kmdedit.zoom')) || zoom;
   } catch { /* sem storage */ }
   applyTheme(theme, { rerender: false });
   applyZoom(zoom);
@@ -132,7 +132,7 @@ function renderTabs() {
   plus.title = 'Nova aba';
   plus.addEventListener('click', newTab);
   tabbar.appendChild(plus);
-  document.title = tabs.active() ? 'mdedit — ' + tabs.title(tabs.active()) : 'mdedit';
+  document.title = tabs.active() ? 'kMdedit — ' + tabs.title(tabs.active()) : 'kMdedit';
 }
 
 // Salva o estado de edição da aba atual antes de trocar.
@@ -180,7 +180,7 @@ async function closeTab(id) {
   if (!t) return;
   if (id === tabs.activeId) captureCurrent();
   if (t.dirty) {
-    const ok = await ask(`"${tabs.title(t).replace(' •', '')}" tem alterações não salvas. Fechar mesmo assim?`, { title: 'mdedit', kind: 'warning' });
+    const ok = await ask(`"${tabs.title(t).replace(' •', '')}" tem alterações não salvas. Fechar mesmo assim?`, { title: 'kMdedit', kind: 'warning' });
     if (!ok) return;
   }
   const wasActive = id === tabs.activeId;
@@ -913,7 +913,7 @@ async function openPath(picked, { quiet = false } = {}) {
     renderRecent();
     const msg = err && err.message ? err.message : String(err);
     if (!quiet) setStatus(`não foi possível abrir ${basename(picked)}: ${msg}`, { error: true });
-    else console.warn('[mdedit] abrir', picked, msg);
+    else console.warn('[kmdedit] abrir', picked, msg);
     return false;
   }
   openText({ path: picked, text, mode: defaultModeForPath(picked) });
@@ -935,7 +935,7 @@ function openText({ path = null, text, mode = 'wysiwyg' }) {
 }
 
 // ---------- arquivos recentes (até 20, únicos, persistidos) ----------
-const RECENT_KEY = 'mdedit.recent';
+const RECENT_KEY = 'kmdedit.recent';
 function loadRecent() {
   try { return normalizeRecent(JSON.parse(localStorage.getItem(RECENT_KEY) || '[]')); }
   catch { return []; }
@@ -1025,7 +1025,7 @@ async function setupDrop() {
       });
       return;
     } catch (err) {
-      console.warn('[mdedit] arrasto nativo indisponível, usando o do navegador:', err);
+      console.warn('[kmdedit] arrasto nativo indisponível, usando o do navegador:', err);
     }
   }
   document.addEventListener('dragover', (e) => { e.preventDefault(); showDrop(true); });
@@ -1053,11 +1053,11 @@ async function setupCloseGuard() {
     await getCurrentWindow().onCloseRequested(async (ev) => {
       captureCurrent();
       if (!tabs.anyDirty()) return;
-      const ok = await ask('Há alterações não salvas. Sair mesmo assim?', { title: 'mdedit', kind: 'warning' });
+      const ok = await ask('Há alterações não salvas. Sair mesmo assim?', { title: 'kMdedit', kind: 'warning' });
       if (!ok) ev.preventDefault();
     });
   } catch (err) {
-    console.warn('[mdedit] guarda de fechamento indisponível:', err);
+    console.warn('[kmdedit] guarda de fechamento indisponível:', err);
   }
 }
 
@@ -1121,7 +1121,7 @@ listen('menu', (ev) => {
   const id = ev.payload;
   if (ACTIONS[id]) ACTIONS[id]();
   else if (isWysiwyg() && FMT[id]) FMT[id]();
-}).catch((err) => console.warn('[mdedit] menu nativo indisponível:', err));
+}).catch((err) => console.warn('[kmdedit] menu nativo indisponível:', err));
 
 // ---------- inicialização ----------
 localizeHints();
