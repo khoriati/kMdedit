@@ -13,6 +13,8 @@ Projeto open source de [Marcos Khoriati](https://khori.com.br), licença MIT.
 
 - [Recursos](#recursos)
 - [Instalação](#instalação)
+  - [Baixar o binário](#baixar-o-binário-macos-apple-silicon)
+  - [Compilar a partir do código](#compilar-a-partir-do-código)
 - [Uso](#uso)
 - [Atalhos](#atalhos)
 - [Desenvolvimento](#desenvolvimento)
@@ -44,7 +46,24 @@ Projeto open source de [Marcos Khoriati](https://khori.com.br), licença MIT.
 
 ## Instalação
 
-Não há binários publicados ainda. Para gerar o instalador da sua plataforma:
+### Baixar o binário (macOS Apple Silicon)
+
+1. Baixe `kMdedit_<versão>_aarch64.dmg` na página de
+   [Releases](https://github.com/khoriati/kMdedit/releases/latest).
+2. Abra o `.dmg` e arraste `kMdedit.app` para `Aplicativos`.
+3. Na primeira abertura o Gatekeeper avisa que o app é de um desenvolvedor não
+   identificado (assinatura ad-hoc, sem certificado Apple). Clique com o botão
+   direito em `kMdedit.app` → **Abrir** → **Abrir**, ou remova a quarentena:
+
+   ```bash
+   xattr -dr com.apple.quarantine /Applications/kMdedit.app
+   ```
+
+Cada release traz o `.sha256` do pacote; confira com `shasum -a 256 -c`.
+Ainda não há binários para Macs Intel, Windows ou Linux: nessas plataformas,
+compile a partir do código.
+
+### Compilar a partir do código
 
 ```bash
 git clone https://github.com/khoriati/kMdedit.git
