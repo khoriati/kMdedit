@@ -8,8 +8,8 @@ fn item<R: Runtime>(app: &AppHandle<R>, id: &str, label: &str, accel: Option<&st
 }
 
 pub fn build<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
-    let app_menu = Submenu::with_items(app, "mdedit", true, &[
-        &PredefinedMenuItem::about(app, Some("Sobre mdedit"), None)?,
+    let app_menu = Submenu::with_items(app, "kMdedit", true, &[
+        &PredefinedMenuItem::about(app, Some("Sobre kMdedit"), None)?,
         &PredefinedMenuItem::separator(app)?,
         &PredefinedMenuItem::services(app, None)?,
         &PredefinedMenuItem::separator(app)?,

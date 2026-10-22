@@ -1,4 +1,4 @@
-// Backend mdedit: leitura/escrita atômica de arquivos de texto.
+// Backend kMdedit: leitura/escrita atômica de arquivos de texto.
 //
 // `read_text` aceita qualquer arquivo desde que seja texto UTF-8 (sem NUL,
 // poucos bytes de controle) e dentro do limite de tamanho; é o que permite
@@ -79,7 +79,7 @@ mod tests {
     use super::*;
 
     fn tmp_dir(tag: &str) -> std::path::PathBuf {
-        let dir = std::env::temp_dir().join(format!("mdedit-test-{tag}-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("kmdedit-test-{tag}-{}", std::process::id()));
         fs::create_dir_all(&dir).unwrap();
         dir
     }
@@ -146,5 +146,5 @@ pub fn run() {
         })
         .on_menu_event(|app, event| menu::on_event(app, event.id().as_ref()))
         .run(tauri::generate_context!())
-        .expect("erro ao iniciar mdedit");
+        .expect("erro ao iniciar kMdedit");
 }

@@ -1,9 +1,9 @@
 {
-  "name": "mdedit",
+  "name": "kmdedit",
   "version": "1.0.0",
-  "description": "Editor de Markdown multiplataforma (Tauri) com Mermaid e alternancia render/fonte.",
+  "description": "Editor de Markdown multiplataforma (Tauri) com Mermaid e alternância WYSIWYG, código e visualização.",
   "type": "commonjs",
-  "author": "mdedit",
+  "author": "Marcos Khoriati <khoriati@gmail.com> (https://khori.com.br)",
   "license": "MIT",
   "scripts": {
     "build:ui": "esbuild ui/app.js --bundle --format=iife --outfile=ui/dist/app.js --minify",
